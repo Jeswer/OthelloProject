@@ -3,59 +3,61 @@ import java.util.ArrayList;
 public class KlogAI implements IOthelloAI {
 
     public Position decideMove(GameState s) {
-        return maxValue(s, Integer.MIN_VALUE, Integer.MAX_VALUE).getPosition();
+        MoveScore fMoveScore = maxValue(s, Integer.MIN_VALUE, Integer.MAX_VALUE, 8);
+        System.out.println(fMoveScore.getPosition());
+        return fMoveScore.getPosition();
+        
     }
-
-    public MoveScore maxValue(GameState s, int alpha, int beta) {
-        ArrayList<Position> moves = s.legalMoves();
-        Position bestMove = new Position(0, 0);
-        if (s.isFinished()) {
-            return null;
+    public MoveScore maxValue(GameState s, int alpha, int beta, int depth) {
+        ArrayList<Position> legalMoves = s.legalMoves();
+        Position pos = null;
+        if (depth == 0 || s.isFinished()) {
+            int util = Utility.evaluateGameState(s);
+            return new MoveScore(util, null);
         } else {
-            int v = Integer.MAX_VALUE;
-            GameState newState = new GameState(s.getBoard(), s.getPlayerInTurn());
-            for (Position move : moves) {
-                s.insertToken(move, null);
-                MoveScore scoreMove = minValue(newState, alpha, beta);
-                int v2 = scoreMove.getScore();
+            int v = Integer.MIN_VALUE;
+            for (Position p : legalMoves) {
+                GameState nGameState = new GameState(s.getBoard(), s.getPlayerInTurn()); 
+                nGameState.insertToken(p, null);
+                int v2 = minValue(nGameState, alpha, beta, depth - 1).getScore();
                 if (v2 > v) {
                     v = v2;
-                    bestMove = move;
+                    pos = p;
+                    alpha = Math.max(alpha, v);
                 }
-                alpha = Math.max(alpha, v);
-                if (alpha >= beta) {
-                    break;
+
+                if (v >= beta) { 
+                    return new MoveScore(v, pos);
                 }
             }
-            return new MoveScore(v, bestMove);
+            return new MoveScore(v, pos);
+        }
 
+    }
+
+    private MoveScore minValue(GameState s, int alpha, int beta, int depth) {
+        ArrayList<Position> legalMoves = s.legalMoves();
+        Position pos = null;
+        if(depth == 0 || s.isFinished()) {
+            int util = Utility.evaluateGameState(s);
+            return new MoveScore(util, null);
+        } else {
+            int v = Integer.MAX_VALUE;
+            for (Position p : legalMoves) {
+                GameState nGameState = new GameState(s.getBoard(), s.getPlayerInTurn()); 
+                nGameState.insertToken(p, null);
+                int v2 = maxValue(nGameState, alpha, beta, depth - 1).getScore();
+                if(v2 < v) {
+                    v = v2;
+                    pos = p;
+                    beta = Math.min(beta,v);
+                }
+                if(v <= alpha) {
+                    return new MoveScore(v, pos);
+                }
+            }
+            return new MoveScore(v, pos);
         }
     }
 
-    public MoveScore minValue(GameState s, int alpha, int beta) {
-        ArrayList<Position> moves = s.legalMoves();
-        Position bestMove = new Position(0, 0);
-        if (s.isFinished()) {
-            return null;
-        } else {
-            int v = Integer.MAX_VALUE;
-            GameState newState = new GameState(s.getBoard(), s.getPlayerInTurn());
-            for (Position move : moves) {
-                s.insertToken(move, null);
-                MoveScore scoreMove = maxValue(newState, alpha, beta);
-                int v2 = scoreMove.getScore();
-                if (v2 > v) {
-                    v = v2;
-                    bestMove = move;
-                }
-
-                alpha = Math.max(alpha, v);
-                if (v >= beta) {
-                    break;
-                }
-            }
-            return new MoveScore(v, bestMove);
-
-        }
-    }
 }
