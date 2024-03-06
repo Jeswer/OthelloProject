@@ -112,8 +112,9 @@ public class GameState {
 	 * If it is legal for the current player to put a token at the given place, then the token is inserted, the required 
 	 * tokens from the opponent is turned, and true is returned. If the move is not legal, false is returned. 
 	 * False is also returned if the given place does not represent a place on the board. 
+	 * @param js
 	 */
-    public boolean insertToken(Position place) { 
+    public boolean insertToken(Position place, int[] js) { 
     	if ( place.col < 0 || place.row < 0 || place.col >= size || place.row >= size ) //not a position on the board
     		return false;
     	if ( board[place.col][place.row] != 0 ) // The position is not empty
@@ -194,5 +195,9 @@ public class GameState {
         else
         	return 0;
     }
+
+	public int getSize() {
+		return size;
+	}
 
 }

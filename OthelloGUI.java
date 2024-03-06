@@ -111,7 +111,7 @@ public class OthelloGUI extends JComponent implements MouseListener
     	int currentPlayer = state.getPlayerInTurn();
     	if ( !state.isFinished() ){
     		Position place = getPlaceForNextToken(e);
-    		if ( state.insertToken(place) ){ // Chosen move is legal
+    		if ( state.insertToken(place, null) ){ // Chosen move is legal
 				boolean nextPlayerCannotMove = state.legalMoves().isEmpty();
    				if ( nextPlayerCannotMove ){ // The next player cannot move
 					repaint();
