@@ -4,11 +4,10 @@ public class KlogAI implements IOthelloAI {
 
     public Position decideMove(GameState s) {
         MoveScore fMoveScore = maxValue(s, Integer.MIN_VALUE, Integer.MAX_VALUE, 8);
-        System.out.println(fMoveScore.getPosition());
         return fMoveScore.getPosition();
         
     }
-    public MoveScore maxValue(GameState s, int alpha, int beta, int depth) {
+    private MoveScore maxValue(GameState s, int alpha, int beta, int depth) {
         ArrayList<Position> legalMoves = s.legalMoves();
         Position pos = null;
         if (depth == 0 || s.isFinished()) {
