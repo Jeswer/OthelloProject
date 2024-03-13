@@ -1,18 +1,66 @@
 import java.util.ArrayList;
 
 public class Utility {
+
+    private static final int MOBILITY_WEIGHT = 10;  // Weight for mobility
+    private static final int TOKENS_WEIGHT = 100;   // Weight for token count
+    private static final int CORNER_WEIGHT = 500;
+
     public static int evaluateGameState(GameState s) {
-        // number of legal moves left:
-        ArrayList<Position> legalmoveList = s.legalMoves();
-        s.changePlayer();
-        ArrayList<Position> legalmoveList1 = s.legalMoves();
-        s.changePlayer();
-        // number of tokens
-        int[] tokens = s.countTokens(); 
+        int currentplayer = s.getPlayerInTurn();
+        int mobility = calculateMobility(s, currentplayer);
+        int tokens = calculateTokenCount(s, currentplayer);
+        int corners = calculateCorners(s, currentplayer);
 
-        
-
-        return (int) (0.5 * (legalmoveList.size() - legalmoveList1.size())) + (int) (0.5 * (tokens[1] - tokens[0]));
+        // Combine the components using the predefined weights
+        return MOBILITY_WEIGHT * mobility
+                + TOKENS_WEIGHT * tokens
+                + CORNER_WEIGHT * corners;
 
     }
+
+    private static int calculateCorners(GameState s, int currentPlayer){
+        if (currentPlayer == 1){
+            return calculateCornerOccupancy(s, 1) - calculateCornerOccupancy(s, 2);
+        }
+        else{
+            return calculateCornerOccupancy(s, 2) - calculateCornerOccupancy(s, 1);
+        }
+    }
+
+    private static int calculateCornerOccupancy(GameState s, int currentPlayer) {
+        int[][] board = s.getBoard();
+        int cornerScore = 0;
+        int bounds = board.length-1;
+        cornerScore += board[0][0] == currentPlayer ? 1 : 0; // Top-left corner
+        cornerScore += board[0][bounds] == currentPlayer ? 1 : 0; // Top-right corner
+        cornerScore += board[bounds][0] == currentPlayer ? 1 : 0; // Bottom-left corner
+        cornerScore += board[bounds][bounds] == currentPlayer ? 1 : 0; // Bottom-right corner
+        return cornerScore;
+    }
+
+    private static int calculateTokenCount(GameState s, int currentPlayer) {
+        int[] tokens = s.countTokens();
+        if (currentPlayer == 1){
+            return tokens[0] - tokens[1];
+        }
+        else{
+            return tokens[1] - tokens[0];
+        }
+    }
+
+    private static int calculateMobility(GameState s, int currentPlayer) {
+        ArrayList<Position> legalMoves = s.legalMoves();
+        s.changePlayer();
+        ArrayList<Position> legalMoves2 = s.legalMoves();
+        s.changePlayer();
+        if (currentPlayer == 1){
+            return legalMoves.size() - legalMoves2.size();
+        }
+        else{
+            return legalMoves2.size() - legalMoves.size();
+        }
+    }
+
+
 }

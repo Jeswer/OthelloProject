@@ -3,14 +3,13 @@ import java.util.ArrayList;
 public class KlogAI implements IOthelloAI {
 
     public Position decideMove(GameState s) {
-        MoveScore fMoveScore = maxValue(s, Integer.MIN_VALUE, Integer.MAX_VALUE, 8);
+        MoveScore fMoveScore = maxValue(s, Integer.MIN_VALUE, Integer.MAX_VALUE, 6);
         return fMoveScore.getPosition();
-        
     }
     private MoveScore maxValue(GameState s, int alpha, int beta, int depth) {
         ArrayList<Position> legalMoves = s.legalMoves();
         Position pos = null;
-        if (depth == 0 || s.isFinished()) {
+        if (depth == 0 || legalMoves.isEmpty()) {
             int util = Utility.evaluateGameState(s);
             return new MoveScore(util, null);
         } else {
@@ -25,7 +24,7 @@ public class KlogAI implements IOthelloAI {
                     alpha = Math.max(alpha, v);
                 }
 
-                if (v >= beta) { 
+                if (v >= beta) {
                     return new MoveScore(v, pos);
                 }
             }
@@ -37,7 +36,7 @@ public class KlogAI implements IOthelloAI {
     private MoveScore minValue(GameState s, int alpha, int beta, int depth) {
         ArrayList<Position> legalMoves = s.legalMoves();
         Position pos = null;
-        if(depth == 0 || s.isFinished()) {
+        if(depth == 0 || legalMoves.isEmpty()) {
             int util = Utility.evaluateGameState(s);
             return new MoveScore(util, null);
         } else {
