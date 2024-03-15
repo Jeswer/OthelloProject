@@ -7,6 +7,7 @@ public class MoveScore {
         this.bestMove = bestMove;
     }
 
+
     public int getScore() {
         return score;
     }
