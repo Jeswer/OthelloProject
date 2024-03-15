@@ -5,17 +5,22 @@ public class Utility {
     private static final int MOBILITY_WEIGHT = 10;  // Weight for mobility
     private static final int TOKENS_WEIGHT = 100;   // Weight for token count
     private static final int CORNER_WEIGHT = 500;
+    private static final int EDGE_WEIGHT = 200;     // Weight for edge 
+
 
     public static int evaluateGameState(GameState s) {
         int currentplayer = s.getPlayerInTurn();
         int mobility = calculateMobility(s, currentplayer);
         int tokens = calculateTokenCount(s, currentplayer);
         int corners = calculateCorners(s, currentplayer);
+        int edges = calculateEdges(s, currentplayer);
+
 
         // Combine the components using the predefined weights
         return MOBILITY_WEIGHT * mobility
                 + TOKENS_WEIGHT * tokens
-                + CORNER_WEIGHT * corners;
+                + CORNER_WEIGHT * corners
+                + EDGE_WEIGHT * edges;
 
     }
 
@@ -62,5 +67,27 @@ public class Utility {
         }
     }
 
+    private static int calculateEdges(GameState s, int currentPlayer){
+        int[][] preferablePos = s.getBoard();
+        ArrayList<Position> preferablePosList = new ArrayList<>();
+    
+        for (int i = 0; i < preferablePos.length; i++) {
+            for (int j = 0; j < preferablePos[i].length; j++) {
+                if (i == 0 && j != 0 && j < preferablePos[i].length-1 || i == preferablePos.length-1 && j != 0 && j < preferablePos[i].length-1 
+                || j == 0 && i != 0 && i < preferablePos.length-1 || j == preferablePos.length-1 && i != 0 && i < preferablePos.length-1) {
+                    preferablePosList.add(new Position(i, j));
+                }
+            }
+        }
+        int val = 0;
+        for (Position pos1 : preferablePosList) {
+            for (Position pos2 : s.legalMoves()) {
+                if (pos1.equals(pos2)) {
+                    val = 1;
+                }
+            }
+        }
+        return val;
+    }
 
 }
